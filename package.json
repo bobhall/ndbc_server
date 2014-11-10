@@ -1,0 +1,29 @@
+{
+  "name": "ndbc_server",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://git.3tier.com/software/forecast_api.git"
+  },
+  "dependencies": {
+    "bunyan": "0.22.x",
+    "node-restify-validation": "0.0.6",
+    "request": "2.27.x",
+    "restify": "2.6.x",
+    "timezone": "0.0.30",
+    "xml2js": "0.4.4",
+    "http-string-parser":"0.0.4",
+    "querystring":"0.2.0",
+    "underscore": "1.5.x",
+    "cheerio":"0.18.0"
+  },
+  "devDependencies": {
+    "mocha": "~1.21.4",
+    "xunit-file": "~0.0.5",
+    "jshint": "~2.4.3"
+  },
+  "jshintConfig": {
+    "supernew": true,
+    "node": true
+  }
+}
