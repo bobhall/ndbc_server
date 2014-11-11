@@ -17,34 +17,45 @@ server.use(restify.queryParser());
 server.use(restify.bodyParser());
 server.use(restify.CORS());
 
+function parseWestPoint(data){
+  html = cheerio.load(data);
+  var relevant_string = html('b')[0].next.data;
 
-var urls = ['http://www.nws.noaa.gov/view/validProds.php?prod=CGR&node=KSEW',
-	    'http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1']
-	    
+  var wind_direction = relevant_string.split(',')[0];
+  var wind_speed =     relevant_string.split(',')[1];
+
+  wind_direction = wind_direction.match(/([0-9\.]+)/g)[0];
+  wind_speed     = wind_speed.match(/[0-9\.]+/g)[0];
+
+  return {wind_speed: wind_speed,
+	  wind_direction: wind_direction,
+	  station_name: 'West Point'
+  };
+};
+
+function parseCGR(data){
+  return [];
+};
+
+var urls = [//'http://www.nws.noaa.gov/view/validProds.php?prod=CGR&node=KSEW',
+	    {url:'http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1', 
+	     parser: parseWestPoint, 
+	     name: 'West Point'},
+	    {ur: 'http://forecast.weather.gov/product.php?site=GRB&product=CGR&issuedby=SEW',
+	     parser: parseCGR, // CGR = Coast Guard Report. This page contains multiple obs stations.
+	     name: 'CGR'}]
+
+
+
 
 function getAllObs(req, res, next){
-  res.setHeader('Access-Control-Allow-Origin','*');
-//  res.send(200, {robert: 'hall'});
 
+//  var obs = [];
+
+  res.setHeader('Access-Control-Allow-Origin','*');
   request('http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1', function(error, response, body) {
     if (!error && response.statusCode == 200) {
-//      console.log(body);
-
-      html = cheerio.parseHTML(body[0]);
-      console.log(html);
-    
-
-//      console.log(qs.parse(body));
-//      message = parser.parseResponse(body);
-//      console.log(message);
-//      res.send(200,message);
-/*      xml.parseString(body,function(err, result) {
-	console.log(err);
-	console.log(result);
-	res.send(200,result);
-      });
-*/
-      res.send(200,{});
+      res.send(200, parseWestPoint(body));
     }
     return next();
   });
