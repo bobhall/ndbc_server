@@ -19,23 +19,18 @@ server.use(restify.queryParser());
 server.use(restify.bodyParser());
 server.use(restify.CORS());
 
-function parseWestPoint(data){
-  console.log('parsing wp...');
-
+function parseNDBCSite(data, name){
   var html = cheerio.load(data);
   var raw_string = html('b')[0].next.data;
 
-  var wind_direction = raw_string.split(',')[0];
-  var wind_speed =     raw_string.split(',')[1];
+  var wind_direction = raw_string.split(',')[0],
+      wind_speed     = raw_string.split(',')[1];
 
-  wind_direction = wind_direction.match(/([0-9\.]+)/g)[0];
-  wind_speed     = wind_speed.match(/[0-9\.]+/g)[0];
-
-  return [{wind_speed: wind_speed,
-	  wind_direction: wind_direction,
-	  station_name: 'West Point',
-	  time: '?'
-  }];
+  return [{wind_speed: wind_speed.match(/([0-9\.]+)/g)[0],
+	   wind_direction: wind_direction.match(/[0-9\.]+/g)[0],
+	   station_name: name,
+	   time: 'time_in'
+	  }];
 };
 
 function parseCGR(data){
@@ -68,16 +63,16 @@ function parseCGR(data){
   return obs;
 };
 
-var urls = [//'http://www.nws.noaa.gov/view/validProds.php?prod=CGR&node=KSEW',
-	    {url:'http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1', 
-	     parser: parseWestPoint, 
+var urls = [{url:'http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1', 
+	     parser: parseNDBCSite, 
 	     name: 'West Point'},
+	    {url: 'http://www.ndbc.noaa.gov/mobile/station.php?station=sisw1',
+	     parser: parseNDBCSite,
+	     name: 'Smith Island'
+	    },
 	    {url: 'http://forecast.weather.gov/product.php?site=GRB&product=CGR&issuedby=SEW',
 	     parser: parseCGR, // CGR = Coast Guard Report. This page contains multiple obs stations.
-	     name: 'CGR'}]
-
-
-
+	     name: 'CGR'}];
 
 function getAllObs(req, res, next){
 
@@ -92,7 +87,7 @@ function getAllObs(req, res, next){
   urls.forEach(function(station,ix){
     console.log('requesting ' + station.name);
     request(station.url, function(error,response,body){
-      obs = obs.concat(station.parser(body));
+      obs = obs.concat(station.parser(body, station.name));
       callback();
     });
   });
