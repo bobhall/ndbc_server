@@ -40,24 +40,32 @@ function parseWestPoint(data){
 
 function parseCGR(data){
 
-  console.log('parsing cgr...');
-/*
+  var station_names = [{regex: /POINT NO POINT/g, name:'Point No Point'},
+		       {regex: /POINT ROBINSON/g, name:'Point Robinson'},
+		       {regex: /POINT WILSON/g, name:'Point Wilson'},
+		       {regex: /ALKI POINT/g, name:'Alki Point'}];
+
   var html = cheerio.load(data);
-  var raw_string = html('.glossaryProduct')[0].children[0].data;
+  var raw_strings = html('.glossaryProduct')[0].children[0].data.split('\n');
 
-  raw_strings = raw_string.split('\n');
+  var obs = [];
+  raw_strings.forEach(function(raw_string){
+    station_names.forEach(function(station,i){
 
-  var report_time = raw_strings[2].split(' ')[2]; // Ex: 'SXUS40 KSEW 102353' where 102353 is DDHHSS in UTC.
-  var point_wilson = raw_strings[8].split('/')
-*/
-  var point_wilson_wind_speed = 'abc',
-  point_wilson_wind_direction = 'def';
+      if (raw_string.split('/').length == 5 && 
+	  raw_string.split('/')[4].match(station.regex)) {
 
-  return [{wind_speed: point_wilson_wind_speed,
-	   wind_direction: point_wilson_wind_direction,
-	   station_name: 'Point Wilson',
-	   time: '?'
-  }];
+	obs.push({
+	  wind_speed: raw_string.split('/')[1].match(/([0-9\.]+)/g)[0],
+	  wind_direction: raw_string.split('/')[1].match(/([A-Z\.]+)/g)[0],
+	  station_name: station.name,
+	  time: 'time_in'
+	});
+
+      }//endif
+    });
+  });
+  return obs;
 };
 
 var urls = [//'http://www.nws.noaa.gov/view/validProds.php?prod=CGR&node=KSEW',
