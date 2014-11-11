@@ -6,7 +6,8 @@ var restify = require('restify'),
      qs = require('querystring'),
   jsdom = require('jsdom'),
 cheerio = require('cheerio');
-      _ = require('underscore');
+      _ = require('underscore'),
+     tz = require('timezone');
 
 var ip_addr = '127.0.0.1';
 var port    = '8080';
