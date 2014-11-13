@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head> 
+    <title>Puget Sound Wind Observations</title>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="show_me_the_wind.js" type="text/javascript"></script>
+
+    <style>
+      .wind-box{
+        border: 2px solid;
+        padding: 10px 40px;
+
+        padding-top: 15px;
+        padding-bottom: 15px;
+
+        border-radius: 25px;
+        width: 300px;
+        background: #dddddd;
+        display: none;
+      }
+
+      .station-name{
+        font-weight: bold;
+      }
+
+      .time-stamp{
+        font-size: small;
+        color: green;
+      }
+
+      .time-stamp-late{
+        color: red;
+      }
+    </style>
+
+  </head>
+
+  <body>
+    <div class="outer-container">
+      <div class="wind-box">
+	<span class="station-name"></span><br>
+	<span class="wind-speed"></span> Kts, 
+	<span class="wind-direction"></span><br>
+	<span class="time-stamp"></span>
+      </div>
+    </div>
+  </body>
+
+</html>
+
