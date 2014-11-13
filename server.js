@@ -88,13 +88,22 @@ $$
       if (raw_string.split('/').length == 5 && 
 	  raw_string.split('/')[4].match(station.regex)) {
 
+	var wind_speed, wind_dir;
+	// Wind speed and direction fields can look like: W00, or NE10, or CALM
+	if (raw_string.split('/')[1].trim() == "CALM") {
+	  wind_speed = "0";
+	  wind_dir = null;
+	} else {
+	  wind_speed = raw_string.split('/')[1].match(/([0-9\.]+)/g)[0];
+	  wind_dir =   raw_string.split('/')[1].match(/([A-Z\.]+)/g)[0];
+	}
+
 	obs.push({
-	  wind_speed: raw_string.split('/')[1].match(/([0-9\.]+)/g)[0],
-	  wind_direction: raw_string.split('/')[1].match(/([A-Z\.]+)/g)[0],
+	  wind_speed: wind_speed,
+	  wind_direction: wind_dir,
 	  station_name: station.name,
 	  time: us(time_in, "America/Los_Angeles","%c")
 	});
-
       }//endif
     });
   });
@@ -118,7 +127,6 @@ function getAllObs(req, res, next){
 
   var obs = [];
   var callback = _.after(urls.length, function(){
-    console.log("callback")
     res.send(200, obs);
   });
 
@@ -138,5 +146,5 @@ server.get({path: PATH,
 	   getAllObs);
 
 server.listen(port, ip_addr, function(){
-  console.log("Hello.")
+  console.log("Started server....")
 });
