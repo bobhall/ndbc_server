@@ -7,7 +7,8 @@ var restify = require('restify'),
   jsdom = require('jsdom'),
 cheerio = require('cheerio');
       _ = require('underscore'),
-     tz = require('timezone');
+     tz = require('timezone'),
+     wu = require('./wind_utils');
 
 var us = tz(require("timezone/America"));
 
@@ -32,8 +33,11 @@ function parseNDBCSite(data, name){
   var wind_direction = raw_string.split(',')[0],
       wind_speed     = raw_string.split(',')[1];
 
-  return [{wind_speed: wind_speed.match(/([0-9\.]+)/g)[0],
-	   wind_direction: wind_direction.match(/[0-9\.]+/g)[0],
+  wind_speed = wind_speed.match(/([0-9\.]+)/g)[0];
+  wind_direction = wind_direction.match(/[0-9\.]+/g)[0];
+
+  return [{wind_speed: wind_speed,
+	   wind_direction: wu.degrees_to_cardinal(wind_direction),
 	   station_name: name,
 	   time: time
 	  }];
