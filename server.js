@@ -103,7 +103,7 @@ $$
 	}
 
 	obs.push({
-	  wind_speed: wind_speed,
+	  wind_speed: parseInt(wind_speed).toString(),
 	  wind_direction: wind_dir,
 	  station_name: station.name,
 	  time: us(time_in, "America/Los_Angeles","%c")
