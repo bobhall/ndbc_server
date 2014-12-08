@@ -1,10 +1,6 @@
 
 var restify = require('restify'),
     request = require('request'),
-    xml = require('xml2js'),
- parser = require('http-string-parser'),
-     qs = require('querystring'),
-  jsdom = require('jsdom'),
 cheerio = require('cheerio');
       _ = require('underscore'),
      tz = require('timezone'),
@@ -33,6 +29,9 @@ function parseNDBCSite(data, name){
   var wind_direction = raw_string.split(',')[0],
       wind_speed     = raw_string.split(',')[1];
 
+  console.log("dir: " + wind_direction);
+  console.log("spd: " + wind_speed);
+
   wind_speed = wind_speed.match(/([0-9\.]+)/g)[0];
   wind_direction = wind_direction.match(/[0-9\.]+/g)[0];
 
@@ -45,6 +44,8 @@ function parseNDBCSite(data, name){
 
 function parseCGR(data){
 
+  console.log(data);
+
   var station_names = [{regex: /POINT NO POINT/g, name:'Point No Point'},
 		       {regex: /POINT ROBINSON/g, name:'Point Robinson'},
 		       {regex: /POINT WILSON/g, name:'Point Wilson'},
@@ -52,6 +53,9 @@ function parseCGR(data){
 
   var html = cheerio.load(data);
   var raw_strings = html('.glossaryProduct')[0].children[0].data.split('\n');
+
+  console.log(html('.glossaryProduct')[0].children[0].data);
+
   /*
     raw_strings comes from calling split('\n') on a string of this format:
 000
@@ -98,12 +102,20 @@ $$
 	  wind_speed = "0";
 	  wind_dir = null;
 	} else {
-	  wind_speed = raw_string.split('/')[1].match(/([0-9\.]+)/g)[0];
-	  wind_dir =   raw_string.split('/')[1].match(/([A-Z\.]+)/g)[0];
+	  if (raw_string.split('/')[1].match(/([0-9\.]+)/g) &&
+	      raw_string.split('/')[1].match(/([A-Z\.]+)/g)) {
+
+	    wind_speed = raw_string.split('/')[1].match(/([0-9\.]+)/g)[0];
+	    wind_dir =   raw_string.split('/')[1].match(/([A-Z\.]+)/g)[0];
+	  }
+	  else {
+	    wind_speed = null;
+	    wind_dir   = null;
+	  }
 	}
 
 	obs.push({
-	  wind_speed: parseInt(wind_speed).toString(),
+	  wind_speed: wind_speed ? parseInt(wind_speed).toString() : wind_speed,
 	  wind_direction: wind_dir,
 	  station_name: station.name,
 	  time: us(time_in, "America/Los_Angeles","%c")
@@ -149,6 +161,13 @@ server.get({path: PATH,
 	    version: '0.0.1'},
 	   getAllObs);
 
-server.listen(port, ip_addr, function(){
-  console.log("Started server....")
-});
+
+if(require.main === module) {
+  server.listen(port, ip_addr, function(){
+    console.log("Started server....")
+  });
+}
+
+
+module.exports.parseNDBCSite = parseNDBCSite;
+module.exports.parseCGR = parseCGR;
