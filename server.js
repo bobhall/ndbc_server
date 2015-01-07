@@ -32,8 +32,10 @@ function parseNDBCSite(data, name){
   console.log("dir: " + wind_direction);
   console.log("spd: " + wind_speed);
 
-  wind_speed = wind_speed.match(/([0-9\.]+)/g)[0];
-  wind_direction = wind_direction.match(/[0-9\.]+/g)[0];
+
+  wind_speed = wind_speed ? wind_speed.match(/([0-9\.]+)/g)[0] : wind_speed;
+  wind_direction = wind_direction ? wind_direction.match(/[0-9\.]+/g)[0] : wind_direction;
+
 
   return [{wind_speed: wind_speed,
 	   wind_direction: wu.degrees_to_cardinal(wind_direction),
