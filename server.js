@@ -133,6 +133,12 @@ $$
 
 function parseFerry(data){
 
+  var areas = {
+    winslow: {top: 47.62, bottom: 47.6, left: -122.463, right: -122.62],
+    edmonds: {top: 47.82, bottom: 47.785, left: -122.467, right: -122.42},
+    rosario: {top: 48.5371, bottom: 48.51, left: -122.76, right: -122.729}
+  };
+
   var $ = cheerio.load(data);
 
   var nn = 0;
