@@ -128,16 +128,68 @@ $$
   return obs;
 };
 
-var urls = [{url:'http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1', 
-	     parser: parseNDBCSite, 
-	     name: 'West Point'},
-	    {url: 'http://www.ndbc.noaa.gov/mobile/station.php?station=sisw1',
-	     parser: parseNDBCSite,
-	     name: 'Smith Island'
-	    },
-	    {url: 'http://forecast.weather.gov/product.php?site=GRB&product=CGR&issuedby=SEW',
-	     parser: parseCGR, // CGR = Coast Guard Report. This page contains multiple obs stations.
-	     name: 'CGR'}];
+
+
+
+function parseFerry(data){
+
+  var $ = cheerio.load(data);
+
+  var nn = 0;
+
+  $('table tr').each(function(ix, tr) {
+
+//    console.log($(tr).text());
+
+    if (nn > 2 && nn < 12) {
+      var line = $(tr).text().split('\t');
+      console.log(line[0].trim());
+      console.log(line[1].trim());
+      console.log(line[2].trim());
+      console.log(line[3].trim());
+      console.log(line[4].trim());
+      console.log(line[5].trim());
+      console.log('------------------------');
+
+
+    }
+    nn = nn+1;
+  });
+
+  return {
+    wind_speed: 4,
+    wind_direction: 180,
+    station_name: 'Puyallup',
+    time: 'now'
+  }
+};
+
+
+var urls = [
+  {url:'http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1', 
+   parser: parseNDBCSite, 
+   position: {
+     lat: 47.662,
+     lon: -122.436 
+   },
+   name: 'West Point'},
+  {url: 'http://www.ndbc.noaa.gov/mobile/station.php?station=sisw1',
+   parser: parseNDBCSite,
+   name: 'Smith Island'
+  },
+  {url: 'http://forecast.weather.gov/product.php?site=GRB&product=CGR&issuedby=SEW',
+   parser: parseCGR, // CGR = Coast Guard Report. This page contains multiple obs stations.
+   name: 'CGR'},
+  
+  {url: 'http://i90.atmos.washington.edu/ferry/tabular/FP.htm',
+   parser: parseFerry,
+   name: 'Puyallup'
+  }, 
+  {url: 'http://i90.atmos.washington.edu/ferry/tabular/FE.htm',
+   parser: parseFerry,
+   name: 'Elwha'
+  }
+];
 
 function getAllObs(req, res, next){
 
