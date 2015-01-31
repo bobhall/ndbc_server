@@ -134,29 +134,58 @@ $$
 function parseFerry(data){
 
   var areas = {
-    winslow: {top: 47.62, bottom: 47.6, left: -122.463, right: -122.62],
+    winslow: {top: 47.62, bottom: 47.6, left: -122.475, right: -122.4275},
     edmonds: {top: 47.82, bottom: 47.785, left: -122.467, right: -122.42},
     rosario: {top: 48.5371, bottom: 48.51, left: -122.76, right: -122.729}
   };
 
   var $ = cheerio.load(data);
-
   var nn = 0;
+
+  var found_locations = false;
+  var locations = [];
 
   $('table tr').each(function(ix, tr) {
 
 //    console.log($(tr).text());
 
-    if (nn > 2 && nn < 12) {
+    if (nn > 2 && nn < 999) {
       var line = $(tr).text().split('\t');
-      console.log(line[0].trim());
+
+      var time = line[0].trim();
+      var location = line[1].trim();
+      var lat = parseFloat(location.split('  ')[0]);
+      var lon = location.split('  ')[1];
+
+//      console.log(location);
+//      console.log(lat + ', ' + lon);
+
+
+      if (lat > areas.winslow.bottom &&
+	  lat < areas.winslow.top &&
+	  lon > areas.winslow.left &&
+	  lon < areas.winslow.right) {
+
+	found_locations = true;
+	console.log('Got one! ' + lat + ' ' + lon + ' ' + time);
+      }
+      else {
+	if (found_locations == true) {
+	  'Done finding locations....'
+	}
+      }
+
+
+
+
+/*      console.log(line[0].trim());
       console.log(line[1].trim());
       console.log(line[2].trim());
       console.log(line[3].trim());
       console.log(line[4].trim());
       console.log(line[5].trim());
       console.log('------------------------');
-
+*/
 
     }
     nn = nn+1;
@@ -166,13 +195,33 @@ function parseFerry(data){
     wind_speed: 4,
     wind_direction: 180,
     station_name: 'Puyallup',
-    time: 'now'
+    time: ferryTimeToTZ('11:14 AM')
   }
 };
 
+/*
+  Input: 11:15 AM, or 4:18 PM, etc
+  Output: string of the date. Example: '2014-01-15 11:15:00 AM PDT'
+*/
+function ferryTimeToTZ(ferry_time){
+  var time = ferry_time.split(' ')[0];
+  var ampm = ferry_time.split(' ')[1];
+
+//  var day =      raw_time_string.substring(0,2);
+  var hour =     time.split(':')[0];
+  if (ampm == 'PM') {hour = parseInt(hour)+12; hour = String(hour);}
+  var minutes =  time.split(':')[1];
+
+  var now = tz(new Date());
+  var time_in = us(now, 'America/Los_Angeles', '%Y-%m-%d') + " " + hour + ":" + minutes + ":00";
+
+//  console.log(tz(now,"%Y") + "-" + tz(now,"%m") + "-" + tz(now,"%d") + " " + hour + ":" + minutes + ":00");
+  
+  return us(time_in, 'America/Los_Angeles', '%c');
+};
 
 var urls = [
-  {url:'http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1', 
+/*  {url:'http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1', 
    parser: parseNDBCSite, 
    position: {
      lat: 47.662,
@@ -186,15 +235,17 @@ var urls = [
   {url: 'http://forecast.weather.gov/product.php?site=GRB&product=CGR&issuedby=SEW',
    parser: parseCGR, // CGR = Coast Guard Report. This page contains multiple obs stations.
    name: 'CGR'},
-  
+
+*/  
   {url: 'http://i90.atmos.washington.edu/ferry/tabular/FP.htm',
    parser: parseFerry,
    name: 'Puyallup'
-  }, 
-  {url: 'http://i90.atmos.washington.edu/ferry/tabular/FE.htm',
+  },
+
+/*  {url: 'http://i90.atmos.washington.edu/ferry/tabular/FE.htm',
    parser: parseFerry,
    name: 'Elwha'
-  }
+  }*/
 ];
 
 function getAllObs(req, res, next){
