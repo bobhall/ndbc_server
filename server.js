@@ -146,16 +146,16 @@ function parseFerry(data){
   var locations = [];
   var station_name = '';
   var speeds = [];
+  var time = null;
 
   $('table tr').each(function(ix, tr) {
 
     if (nn > 2 && nn < 999) {
       var line = $(tr).text().split('\t');
-      var time = line[0].trim();
+
       var location = line[1].trim();
       var lat = parseFloat(location.split('  ')[0]);
       var lon = location.split('  ')[1];
-
       var speed = parseInt(line[5].trim());
       var dir = parseInt(line[4].trim());
 
@@ -166,10 +166,12 @@ function parseFerry(data){
 	found_locations = true;
 	station_name = "Seattle / Bainbridge Island";
 	speeds.push({speed: speed, dir: dir});
+	time = time || line[0].trim();
       }
       else {
 	if (found_locations == true) {
 	  'Done finding locations....'
+	  return false;
 	}
       }
     }
@@ -187,7 +189,8 @@ function parseFerry(data){
       wind_speed: avg.speed.toFixed(1),
       wind_direction: avg.direction.toFixed(1),
       station_name: station_name,
-      time: ferryTimeToTZ('11:14 AM')
+//      time: ferryTimeToTZ('11:14 AM')
+      time: ferryTimeToTZ(time)
     };
   }
 };
