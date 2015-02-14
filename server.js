@@ -144,61 +144,79 @@ function parseFerry(data){
 
   var found_locations = false;
   var locations = [];
+  var station_name = '';
+  var speeds = [];
 
   $('table tr').each(function(ix, tr) {
 
-//    console.log($(tr).text());
-
     if (nn > 2 && nn < 999) {
       var line = $(tr).text().split('\t');
-
       var time = line[0].trim();
       var location = line[1].trim();
       var lat = parseFloat(location.split('  ')[0]);
       var lon = location.split('  ')[1];
 
-//      console.log(location);
-//      console.log(lat + ', ' + lon);
-
+      var speed = parseInt(line[5].trim());
+      var dir = parseInt(line[4].trim());
 
       if (lat > areas.winslow.bottom &&
 	  lat < areas.winslow.top &&
 	  lon > areas.winslow.left &&
 	  lon < areas.winslow.right) {
-
 	found_locations = true;
-	console.log('Got one! ' + lat + ' ' + lon + ' ' + time);
+	station_name = "Seattle / Bainbridge Island";
+	speeds.push({speed: speed, dir: dir});
       }
       else {
 	if (found_locations == true) {
 	  'Done finding locations....'
 	}
       }
-
-
-
-
-/*      console.log(line[0].trim());
-      console.log(line[1].trim());
-      console.log(line[2].trim());
-      console.log(line[3].trim());
-      console.log(line[4].trim());
-      console.log(line[5].trim());
-      console.log('------------------------');
-*/
-
     }
     nn = nn+1;
   });
 
-  return {
-    wind_speed: 4,
-    wind_direction: 180,
-    station_name: 'Puyallup',
-    time: ferryTimeToTZ('11:14 AM')
+  if (!found_locations) {
+    return null;
+  }
+  else {
+
+    var avg = wu.get_average_wind_speed(speeds);
+
+    return {
+      wind_speed: avg.speed.toFixed(1),
+      wind_direction: avg.direction.toFixed(1),
+      station_name: station_name,
+      time: ferryTimeToTZ('11:14 AM')
+    };
   }
 };
 
+
+/*
+Input: an array of wind speeds in degrees (Example: [24,56,33])
+Returns the average wind direction. This is more complicated than you might think.
+
+Algorithm:
+1) Convert each wind speed from degrees to radians. (radians = degrees*pi/180)
+2) Take the sin of each of the radians.
+3) Take the average of that.
+4) Take the inverse sin of that.
+5) Convert to degrees.
+
+*/
+function averageWindSpeeds(wind_speeds)
+{
+  var sins = wind_speeds.map(function(x){return x * Math.PI/180;})
+    .map(function(x){return Math.sin(x);})
+    .reduce(function(a,b){return a+b;});
+
+  var avg_sins = sins / wind_speeds.length;
+
+  var avg_radians = Math.asin(avg_sins);
+
+  return avg_radians * 180 / Math.PI;
+};
 /*
   Input: 11:15 AM, or 4:18 PM, etc
   Output: string of the date. Example: '2014-01-15 11:15:00 AM PDT'
@@ -221,7 +239,7 @@ function ferryTimeToTZ(ferry_time){
 };
 
 var urls = [
-/*  {url:'http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1', 
+  {url:'http://www.ndbc.noaa.gov/mobile/station.php?station=wpow1', 
    parser: parseNDBCSite, 
    position: {
      lat: 47.662,
@@ -236,7 +254,7 @@ var urls = [
    parser: parseCGR, // CGR = Coast Guard Report. This page contains multiple obs stations.
    name: 'CGR'},
 
-*/  
+
   {url: 'http://i90.atmos.washington.edu/ferry/tabular/FP.htm',
    parser: parseFerry,
    name: 'Puyallup'
@@ -245,7 +263,7 @@ var urls = [
 /*  {url: 'http://i90.atmos.washington.edu/ferry/tabular/FE.htm',
    parser: parseFerry,
    name: 'Elwha'
-  }*/
+  } */
 ];
 
 function getAllObs(req, res, next){
