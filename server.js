@@ -182,14 +182,11 @@ function parseFerry(data){
     return null;
   }
   else {
-
     var avg = wu.get_average_wind_speed(speeds);
-
     return {
       wind_speed: avg.speed.toFixed(1),
-      wind_direction: avg.direction.toFixed(1),
+      wind_direction: wu.degrees_to_cardinal(avg.direction),
       station_name: station_name,
-//      time: ferryTimeToTZ('11:14 AM')
       time: ferryTimeToTZ(time)
     };
   }
@@ -220,6 +217,7 @@ function averageWindSpeeds(wind_speeds)
 
   return avg_radians * 180 / Math.PI;
 };
+
 /*
   Input: 11:15 AM, or 4:18 PM, etc
   Output: string of the date. Example: '2014-01-15 11:15:00 AM PDT'
@@ -256,7 +254,6 @@ var urls = [
   {url: 'http://forecast.weather.gov/product.php?site=GRB&product=CGR&issuedby=SEW',
    parser: parseCGR, // CGR = Coast Guard Report. This page contains multiple obs stations.
    name: 'CGR'},
-
 
   {url: 'http://i90.atmos.washington.edu/ferry/tabular/FP.htm',
    parser: parseFerry,

@@ -1,5 +1,5 @@
 
-var wind_directions = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+var cardinal_directions = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
 
 /*
 Input: a wind direction in degrees, like 180, 265, or 50
@@ -7,7 +7,7 @@ Ouput: a cardinal wind direction., like 'S', 'WSW', or 'NW'
 */
 exports.degrees_to_cardinal = function(degrees) {
   degrees = parseInt(degrees);
-  return wind_directions[Math.floor(((degrees+11.25) % 360) / 22.5 )];
+  return cardinal_directions[Math.floor(((degrees+11.25) % 360) / 22.5 )];
 };
 
 /* Convert degrees to radians. */
