@@ -22,7 +22,6 @@ $(document).ready(function() {
 
 	  $(new_box).css("display","block");
 	  $(".outer-container").append(new_box);
-	  $(".outer-container").append("<br>");
 	});
       }
     },

@@ -164,7 +164,7 @@ function parseFerry(data){
 	  lon > areas.winslow.left &&
 	  lon < areas.winslow.right) {
 	found_locations = true;
-	station_name = "Seattle / Bainbridge Island";
+	station_name = "Seattle / Bainbridge Island Ferry";
 	speeds.push({speed: speed, dir: dir});
 	time = time || line[0].trim();
       }
