@@ -1,0 +1,1 @@
+I saved these files here to test the case where 2 ferries intersect a given zone of interest. This was when M/V Tacomas was conducting sea trials between Vashon and Saratoga. This means its path went through the pre-defined zone between Seattle and Winslow. This is a good candidate to test how the application will behave.
