@@ -9,7 +9,7 @@ cheerio = require('cheerio');
 var us = tz(require("timezone/America"));
 
 var ip_addr = '127.0.0.1';
-var port    = '8080';
+var port    = '10006';
 
 var server = restify.createServer({
   name: "ndbc_obs"
