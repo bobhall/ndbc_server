@@ -51,6 +51,7 @@ function parseCGR(data){
   var html = cheerio.load(data);
   var raw_strings = html('.glossaryProduct')[0].children[0].data.split('\n');
 
+  console.log(html('.glossaryProduct')[0].children[0].data);
   /*
     raw_strings comes from calling split('\n') on a string of this format:
 000
@@ -176,6 +177,9 @@ function parseFerry(data){
   }
   else {
     var avg = wu.get_average_wind_speed(speeds);
+//    console.log(speeds);
+//    console.log("AVERAGE:");
+//    console.log(avg);
     return {
       wind_speed: avg.speed.toFixed(1),
       wind_direction: wu.degrees_to_cardinal(avg.direction),

@@ -81,19 +81,29 @@ exports.get_average_wind_speed = function(wind_speeds) {
 };
 
 
+var pad_digits = function(hour) {
+  if (hour in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']) {
+    return '0' + hour;
+  }
+  else {
+    return hour;
+  }
+};
+
 /* 
   Input: 11:15 AM, or 4:18 PM, etc
   Output: string of the date. Example: '2014-01-15 11:15:00 AM PDT'
 */
-exports.ferry_time_to_tz = function(ferry_time) {
+exports.ferry_time_to_tz = function(ferry_time, now) {
   var time = ferry_time.split(' ')[0];
   var ampm = ferry_time.split(' ')[1];
 
   var hour =     time.split(':')[0];
   if (ampm == 'PM') {hour = parseInt(hour)+12; hour = String(hour);}
-  var minutes =  time.split(':')[1];
 
-  var now = tz(new Date());
+  hour = pad_digits(hour);
+  var minutes =  time.split(':')[1];
+  var now = now || tz(new Date());
   var time_in = us(now, 'America/Los_Angeles', '%Y-%m-%d') + " " + hour + ":" + minutes + ":00";
 
   return us(time_in, 'America/Los_Angeles', '%c');

@@ -10,6 +10,16 @@ describe('test degrees to cardinal', function(){
   });
 });
 
+describe('test ferry to tz', function(){
+  it('test early morning', function(){
+    var now = new Date(1426427152753);
+    var time = wu.ferry_time_to_tz('5:41 AM');
+//    console.log("TIME:");
+//    console.log(time);
+    test.string(time)
+      .is('Sun 15 Mar 2015 05:41:00 AM PDT');
+  });
+});
 
 describe('test get average wind speed', function(){
   it('test bad input', function(){
