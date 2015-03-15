@@ -4,7 +4,8 @@ var restify = require('restify'),
 cheerio = require('cheerio');
       _ = require('underscore'),
      tz = require('timezone'),
-     wu = require('./wind_utils');
+     wu = require('./wind_utils'),
+     fs = require('fs');
 
 var us = tz(require("timezone/America"));
 
@@ -177,9 +178,9 @@ function parseFerry(data){
   }
   else {
     var avg = wu.get_average_wind_speed(speeds);
-//    console.log(speeds);
-//    console.log("AVERAGE:");
-//    console.log(avg);
+    console.log(speeds);
+    console.log("AVERAGE:");
+    console.log(avg);
     return {
       wind_speed: avg.speed.toFixed(1),
       wind_direction: wu.degrees_to_cardinal(avg.direction),
@@ -246,11 +247,48 @@ function getAllObs(req, res, next){
   return next();
 };
 
+function getHTML(req, res, next){
+
+  fs.readFile('show_me_the_wind.html', function(err,data){
+    if (err) {
+      next(err);
+      return;
+    };
+
+    res.setHeader('Content-Type', 'text/html');
+//    var body = "<html><h2>Hello.</h2></html>";
+    //  res.send(200, body);
+    res.writeHead(200);
+    res.end(data);
+    next();
+  });
+};
+
+function getJS(req, res, next){
+  fs.readFile('show_me_the_wind.js', function(err,data){
+    if (err) {
+      next(err);
+      return;
+    };
+    res.setHeader('Content-Type', 'application/javascript');
+//    var body = "<html><h2>Hello.</h2></html>";
+    //  res.send(200, body);
+    res.writeHead(200);
+    res.end(data);
+    next();
+  });
+};
 
 var PATH = '/obs';
 server.get({path: PATH,
 	    version: '0.0.1'},
 	   getAllObs);
+server.get({path: '/pugetsoundwind',
+	   version: '0.0.1'},
+	   getHTML);
+server.get({path: '/show_me_the_wind.js',
+	    version: '0.0.1'},
+	   getJS);
 
 if(require.main === module) {
   server.listen(port, ip_addr, function(){

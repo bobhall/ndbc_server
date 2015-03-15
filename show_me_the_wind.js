@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
 
-  var url_base = "http://127.0.0.1:8080";
+  var url_base = "http://127.0.0.1:10006";
   var TWO_HOURS = 1000*60*60*2;
   $.ajax({
     url: url_base + "/obs",
