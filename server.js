@@ -29,9 +29,6 @@ function parseNDBCSite(data, name, position){
   var wind_direction = raw_string.split(',')[0],
       wind_speed     = raw_string.split(',')[1];
 
-  console.log("dir: " + wind_direction);
-  console.log("spd: " + wind_speed);
-
   wind_speed = wind_speed ? wind_speed.match(/([0-9\.]+)/g)[0] : wind_speed;
   wind_direction = wind_direction ? wind_direction.match(/[0-9\.]+/g)[0] : wind_direction;
 
@@ -44,8 +41,7 @@ function parseNDBCSite(data, name, position){
 };
 
 function parseCGR(data){
-
-  console.log(data);
+//  console.log(data);
 
   var station_names = [{regex: /POINT NO POINT/g, name:'Point No Point', position: {lat: 47.9119, lon: -122.5258}},
 		       {regex: /POINT ROBINSON/g, name:'Point Robinson', position: {lat: 47.3881, lon: -122.3742}},
@@ -54,8 +50,6 @@ function parseCGR(data){
 
   var html = cheerio.load(data);
   var raw_strings = html('.glossaryProduct')[0].children[0].data.split('\n');
-
-  console.log(html('.glossaryProduct')[0].children[0].data);
 
   /*
     raw_strings comes from calling split('\n') on a string of this format:
@@ -147,17 +141,15 @@ function parseFerry(data){
   var speeds = []; // keeps track of found speeds
   var time = null;
 
-  $('table tr').each(function(ix, tr) {
+  areas.forEach(function(area){
+    $('table tr').each(function(ix, tr) {
+      var line = $(tr).text().split('\t');
+      var location = line[1].trim();
+      var lat = parseFloat(location.split('  ')[0]); // float
+      var lon = location.split('  ')[1];             // float
+      var speed = parseInt(line[5].trim());
+      var dir = parseInt(line[4].trim());
 
-    var line = $(tr).text().split('\t');
-    
-    var location = line[1].trim();
-    var lat = parseFloat(location.split('  ')[0]); // float
-    var lon = location.split('  ')[1];             // float
-    var speed = parseInt(line[5].trim());
-    var dir = parseInt(line[4].trim());
-
-    areas.forEach(function(area) {
       if (lat > area.bottom && 
 	  lat < area.top &&
 	  lon > area.left &&
@@ -166,15 +158,17 @@ function parseFerry(data){
 	station_name = area.name;
 	position = {lat: lat, lon: lon};
 	speeds.push({speed: speed, dir: dir});
+	
 	time = time || line[0].trim();
-	console.log("Got one: " + time);
       }
       else {
 	if (found_locations == true) {
 	  return false;
 	}
       }
-    }); //end areas.forEach
+    });    
+
+
   });
 
   if (!found_locations) {
@@ -234,7 +228,7 @@ function getAllObs(req, res, next){
   var obs = [];
   var callback = _.after(urls.length, function(){
     obs = obs.filter(function(ob){return ob != null;});
-    obs.sort(function(a,b){console.log(a); console.log(b); return a.position.lat < b.position.lat;});
+    obs.sort(function(a,b){return a.position.lat < b.position.lat;});
     res.send(200, obs);
   });
 

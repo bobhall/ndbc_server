@@ -48,6 +48,7 @@ exports.u_v_to_wind_speed_and_direction = function(u,v) {
   var direction = Math.atan2(-u, -v);
   direction = rad_to_deg(direction);
   direction = direction % 360;
+  direction = (direction + 360) % 360;
   
   return {speed: speed,
 	  direction: direction};
