@@ -1,3 +1,5 @@
+var tz = require('timezone');
+var us = tz(require('timezone/America'));
 
 var cardinal_directions = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
 
@@ -78,3 +80,20 @@ exports.get_average_wind_speed = function(wind_speeds) {
 };
 
 
+/* 
+  Input: 11:15 AM, or 4:18 PM, etc
+  Output: string of the date. Example: '2014-01-15 11:15:00 AM PDT'
+*/
+exports.ferry_time_to_tz = function(ferry_time) {
+  var time = ferry_time.split(' ')[0];
+  var ampm = ferry_time.split(' ')[1];
+
+  var hour =     time.split(':')[0];
+  if (ampm == 'PM') {hour = parseInt(hour)+12; hour = String(hour);}
+  var minutes =  time.split(':')[1];
+
+  var now = tz(new Date());
+  var time_in = us(now, 'America/Los_Angeles', '%Y-%m-%d') + " " + hour + ":" + minutes + ":00";
+
+  return us(time_in, 'America/Los_Angeles', '%c');
+};
