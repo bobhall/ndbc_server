@@ -51,7 +51,6 @@ function parseCGR(data){
 
   var html = cheerio.load(data);
   var raw_strings = html('.glossaryProduct')[0].children[0].data.split('\n');
-
   console.log(html('.glossaryProduct')[0].children[0].data);
   /*
     raw_strings comes from calling split('\n') on a string of this format:
@@ -208,13 +207,17 @@ var urls = [
      lat: 48.318,
      lon: -122.843
    }
-  },
+  }, 
   {url: 'http://forecast.weather.gov/product.php?site=GRB&product=CGR&issuedby=SEW',
    parser: parseCGR, // CGR = Coast Guard Report. This page contains multiple obs stations.
    name: 'CGR'},
   {url: 'http://i90.atmos.washington.edu/ferry/tabular/FP.htm',
    parser: parseFerry,
    name: 'Puyallup'
+  },
+  {url: 'http://i90.atmos.washington.edu/ferry/tabular/FW.htm',
+   parser: parseFerry,
+   name: 'Walla Walla'
   },
   {url: 'http://i90.atmos.washington.edu/ferry/tabular/FS.htm',
    parser: parseFerry,
@@ -223,7 +226,7 @@ var urls = [
   {url: 'http://i90.atmos.washington.edu/ferry/tabular/FE.htm',
    parser: parseFerry,
    name: 'Elwha'
-  } 
+  }
 ];
 
 function getAllObs(req, res, next){
@@ -239,9 +242,21 @@ function getAllObs(req, res, next){
 
   urls.forEach(function(station,ix){
     console.log('requesting ' + station.name);
-    request(station.url, function(error,response,body){
-      obs = obs.concat(station.parser(body, station.name, station.position));
-      callback();
+
+    var options = {
+      url: station.url,
+      headers: {
+	'User-Agent': 'request',
+      }
+    };
+    request(options, function(error,response,body){
+      if (!error && response.statusCode == 200) {
+	obs = obs.concat(station.parser(body, station.name, station.position));
+	callback();
+      }
+      else {
+	callback();
+      }
     });
   });
   return next();
