@@ -131,7 +131,8 @@ function parseFerry(data){
   var areas = [
     {top: 47.62, bottom: 47.6, left: -122.475, right: -122.4275, name: "Seattle / Bainbridge Island Ferry"},
     {top: 47.82, bottom: 47.785, left: -122.467, right: -122.42, name: "Edmonds / Kingston Ferry"},
-    {top: 48.5371, bottom: 48.51, left: -122.76, right: -122.729, name: "Anacortes Ferry (Rosario Strait)"}
+    {top: 48.5371, bottom: 48.51, left: -122.76, right: -122.729, name: "Anacortes Ferry (Rosario Strait)"},
+    {top: 47.587, bottom: 47.57, left: -122.4716, right: -122.4383, name: "Seatte / Bremerton Ferry"}
   ];
 
   var $ = cheerio.load(data);
