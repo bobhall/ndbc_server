@@ -50,6 +50,11 @@ function parseCGR(data){
 		       {regex: /ALKI POINT/g, name:'Alki Point', position: {lat: 47.5763, lon: -122.4208}}];
 
   var html = cheerio.load(data);
+
+  console.log(html('.glossaryProduct'));
+
+  return [];
+
   var raw_strings = html('.glossaryProduct')[0].children[0].data.split('\n');
   console.log(html('.glossaryProduct')[0].children[0].data);
   /*
@@ -73,7 +78,6 @@ SEW MCY10       /W03  /    / 47/                   NOAA-LKWASHINGTON
 
 $$
     */
-
 
   // Grab the time. In the example above, "100402" is DDMMSS, in UTC. We need to fill in year and month ourselves.
   var raw_time_string = raw_strings[2].split(' ')[2];
@@ -156,6 +160,7 @@ function parseFerry(data){
 	  lat < area.top &&
 	  lon > area.left &&
 	  lon < area.right) {
+//	  speed != 999.0) {
 	found_locations = true;
 	station_name = area.name;
 	position = {lat: lat, lon: lon};
@@ -212,6 +217,7 @@ var urls = [
   {url: 'http://forecast.weather.gov/product.php?site=GRB&product=CGR&issuedby=SEW',
    parser: parseCGR, // CGR = Coast Guard Report. This page contains multiple obs stations.
    name: 'CGR'},
+
   {url: 'http://i90.atmos.washington.edu/ferry/tabular/FP.htm',
    parser: parseFerry,
    name: 'Puyallup'
@@ -240,6 +246,8 @@ function getAllObs(req, res, next){
     obs.sort(function(a,b){return a.position.lat < b.position.lat;});
     res.send(200, obs);
   });
+
+  console.log("Starting.");
 
   urls.forEach(function(station,ix){
     console.log('requesting ' + station.name);
